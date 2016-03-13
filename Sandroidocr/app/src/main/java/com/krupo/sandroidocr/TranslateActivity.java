@@ -47,6 +47,7 @@ public class TranslateActivity extends AppCompatActivity {
 
         Intent act = getIntent();
         _path =  act.getStringExtra("path");
+        System.out.println(DATA_PATH);
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 4;
