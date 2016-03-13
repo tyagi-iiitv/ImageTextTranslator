@@ -33,6 +33,7 @@ import android.widget.LinearLayout;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
+
 public class MainActivity extends Activity {
     public static final String PACKAGE_NAME = "com.datumdroid.android.ocr.simple";
     public static final String DATA_PATH = Environment
@@ -154,8 +155,8 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
         String api = "https://www.googleapis.com/language/translate/v2?key=AIzaSyBgOzJaJZ-2vYfX5uA4dgsxkQstIBDBusQ&source=en&target=hi&q="+inp;
-        RequestServer rs = new RequestServer(api,this);
-        rs.execute();
+       // RequestServer rs = new RequestServer(api,this);
+        //rs.execute();
     }
     // Simple android photo capture:
     // http://labs.makemachine.net/2010/03/simple-android-photo-capture/
@@ -177,6 +178,9 @@ public class MainActivity extends Activity {
 
         if (resultCode == -1) {
             onPhotoTaken();
+            Intent ca = new Intent(this,CropActivity.class);
+            ca.putExtra("path",_path);
+            startActivity(ca);
         } else {
             Log.v(TAG, "User cancelled");
         }

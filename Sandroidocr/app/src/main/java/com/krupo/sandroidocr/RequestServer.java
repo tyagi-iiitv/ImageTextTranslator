@@ -27,7 +27,7 @@ public class RequestServer extends AsyncTask<Void,Void,Void> {
     HttpURLConnection urlConnection=null;
     String output=null;
     String api=null;
-    MainActivity ma=null;
+    TranslateActivity ma=null;
 
     @Override
     protected void onPostExecute(Void aVoid) {
@@ -39,7 +39,7 @@ public class RequestServer extends AsyncTask<Void,Void,Void> {
         ma.preexec();
     }
 
-    public RequestServer(String _api,MainActivity s)
+    public RequestServer(String _api,TranslateActivity s)
     {
         this.api=_api;
         ma=s;
