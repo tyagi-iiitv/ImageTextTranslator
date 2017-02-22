@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -15,21 +16,25 @@ import java.net.URLEncoder;
 import java.util.zip.GZIPInputStream;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
@@ -63,11 +68,28 @@ public class MainActivity extends Activity {
 
         String[] paths = new String[] { DATA_PATH, DATA_PATH + "tessdata/" };
 
+
+
+        setContentView(R.layout.activity_main);
+
+        // _image = (ImageView) findViewById(R.id.image);
+        _field = (EditText) findViewById(R.id.scannedText);
+        _button = (Button) findViewById(R.id.takePhoto);
+        translate = (Button) findViewById(R.id.translate);
+        _button.setOnClickListener(new ButtonClickHandler());
+        translatedet=(EditText)findViewById(R.id.translatedText);
+        _path = DATA_PATH + "/ocr.jpg";
+        linHeader = (LinearLayout) findViewById(R.id.linlaHeaderProgress);
+        translate.setOnClickListener(new ButtonClickHandler());
+        boolean internet = isNetworkAvailable(getApplicationContext());
+        boolean permissions = true;
+        boolean tess_file = true;
         for (String path : paths) {
             File dir = new File(path);
             if (!dir.exists()) {
                 if (!dir.mkdirs()) {
                     Log.v(TAG, "ERROR: Creation of directory " + path + " on sdcard failed");
+                    permissions = false;
                     return;
                 } else {
                     Log.v(TAG, "Created directory " + path + " on sdcard");
@@ -82,7 +104,7 @@ public class MainActivity extends Activity {
         // This area needs work and optimization
         if (!(new File(DATA_PATH + "tessdata/" + lang + ".traineddata")).exists()) {
             try {
-
+                System.out.println("File exists***********");
                 AssetManager assetManager = getAssets();
                 InputStream in = assetManager.open("tessdata/" + lang + ".traineddata");
                 //GZIPInputStream gin = new GZIPInputStream(in);
@@ -103,21 +125,16 @@ public class MainActivity extends Activity {
                 Log.v(TAG, "Copied " + lang + " traineddata");
             } catch (IOException e) {
                 Log.e(TAG, "Was unable to copy " + lang + " traineddata " + e.toString());
+                tess_file = false;
             }
         }
+        if(!internet)
+            Toast.makeText(getApplicationContext(), "No internet", Toast.LENGTH_SHORT).show();
+        if(!permissions)
+            Toast.makeText(getApplicationContext(), "No Permissions", Toast.LENGTH_SHORT).show();
+        if(!tess_file)
+            Toast.makeText(getApplicationContext(), "eng.traineddata file not found", Toast.LENGTH_SHORT).show();
 
-
-        setContentView(R.layout.activity_main);
-
-        // _image = (ImageView) findViewById(R.id.image);
-        _field = (EditText) findViewById(R.id.scannedText);
-        _button = (Button) findViewById(R.id.takePhoto);
-        translate = (Button) findViewById(R.id.translate);
-        _button.setOnClickListener(new ButtonClickHandler());
-        translatedet=(EditText)findViewById(R.id.translatedText);
-        _path = DATA_PATH + "/ocr.jpg";
-        linHeader = (LinearLayout) findViewById(R.id.linlaHeaderProgress);
-        translate.setOnClickListener(new ButtonClickHandler());
     }
 
     public class ButtonClickHandler implements View.OnClickListener {
@@ -135,6 +152,13 @@ public class MainActivity extends Activity {
 
         }
     }
+    public boolean isNetworkAvailable(final Context context) {
+        final ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+    }
+
+
+
 
     public void preexec()
     {
@@ -149,13 +173,16 @@ public class MainActivity extends Activity {
     {
         System.out.println("translate");
         String inp = _field.getText().toString();
+        System.out.println("*****"+inp);
         try {
             inp = URLEncoder.encode(inp,"UTF-8");
+            System.out.println("******"+inp);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        String api = "https://www.googleapis.com/language/translate/v2?key=AIzaSyBgOzJaJZ-2vYfX5uA4dgsxkQstIBDBusQ&source=en&target=hi&q="+inp;
-       // RequestServer rs = new RequestServer(api,this);
+        String api = "https://translate.yandex.net/api/v1.5/tr.json/translate ?key=trnsl.1.1.20170222T131651Z.f2fc75b00b288266.56d1e3003dcf5b5d5104f0b80ff47bb13462d15d&lang=en-hi&text="+inp;
+        System.out.println(api);
+        // RequestServer rs = new RequestServer(api,this);
         //rs.execute();
     }
     // Simple android photo capture:
