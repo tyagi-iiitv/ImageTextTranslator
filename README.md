@@ -11,7 +11,7 @@ This android application takes an image of the English text and extracts text fr
 
 - Make sure you're connected to the internet.
 
-- # Features and usage example
+# Features and usage example
 
 - On the first screen, clink on **TAKE PHOTO** on top of your screen.
 
